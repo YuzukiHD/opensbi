@@ -7,3 +7,11 @@ config THEAD_C9XX_PMU
 config THEAD_C9XX_ERRATA
 	bool "T-HEAD c9xx errata support"
 	default n
+
+config THEAD_C9XX_SMP
+	bool "T-HEAD c9xx SMP support"
+	default n
+
+config THEAD_64ILP32_ENHANCE
+	bool "T-HEAD enhancement for 64ilp32"
+	default n

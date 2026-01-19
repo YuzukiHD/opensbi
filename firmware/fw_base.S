@@ -13,6 +13,9 @@
 #include <sbi/sbi_platform.h>
 #include <sbi/sbi_scratch.h>
 #include <sbi/sbi_trap.h>
+#ifdef CONFIG_THEAD_C9XX_SMP
+#include <thead/c9xx_encoding.h>
+#endif
 
 #define BOOT_LOTTERY_ACQUIRED		1
 #define BOOT_STATUS_BOOT_HART_DONE	1
@@ -45,6 +48,9 @@
 	.align 3
 	.globl _start
 	.globl _start_warm
+#ifdef CONFIG_THEAD_C9XX_SMP
+	.globl _start_warm_thead
+#endif
 _start:
 	/* Find preferred boot HART id */
 	MOV_3R	s0, a0, s1, a1, s2, a2
@@ -226,7 +232,11 @@ _scratch_init:
 	REG_S	a0, SBI_SCRATCH_NEXT_MODE_OFFSET(tp)
 	MOV_3R	a0, s0, a1, s1, a2, s2
 	/* Store warm_boot address in scratch space */
-	lla	a4, _start_warm
+#ifdef CONFIG_THEAD_C9XX_SMP
+	lla		a4, _start_warm_thead
+#else
+	lla		a4, _start_warm
+#endif
 	REG_S	a4, SBI_SCRATCH_WARMBOOT_ADDR_OFFSET(tp)
 	/* Store platform address in scratch space */
 	lla	a4, platform
@@ -296,11 +306,22 @@ _fdt_reloc_again:
 _fdt_reloc_done:
 
 	/* mark boot hart done */
-	li	t0, BOOT_STATUS_BOOT_HART_DONE
-	lla	t1, _boot_status
-	fence	rw, rw
-	REG_S	t0, 0(t1)
-	j	_start_warm
+	li		t0, BOOT_STATUS_BOOT_HART_DONE
+	lla		t1, _boot_status
+	fence		rw, rw
+	REG_S		t0, 0(t1)
+	j		_start_warm
+
+#ifdef CONFIG_THEAD_C9XX_SMP
+_start_warm_thead:
+	/* Clear L1 cache & BTB & BHT */
+	li      t0, 0x70013
+	csrw    THEAD_C9XX_CSR_MCOR, t0
+	/* Enable cache coherency */
+	li		t0, 1
+	csrw	THEAD_C9XX_CSR_MSMPR, t0
+	j		_start_warm
+#endif
 
 	/* waiting for boot hart to be done (_boot_status == BOOT_STATUS_BOOT_HART_DONE) */
 _wait_for_boot_hart:

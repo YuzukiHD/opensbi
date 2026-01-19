@@ -152,10 +152,8 @@ static void mstatus_init(struct sbi_scratch *scratch)
 		__set_menvcfg_ext(SBI_HART_EXT_ZICBOZ, ENVCFG_CBZE)
 		__set_menvcfg_ext(SBI_HART_EXT_ZICBOM, ENVCFG_CBCFE)
 		__set_menvcfg_ext(SBI_HART_EXT_ZICBOM,
-				  ENVCFG_CBIE_INV << ENVCFG_CBIE_SHIFT)
-#if __riscv_xlen > 32
+			  ENVCFG_CBIE_INV << ENVCFG_CBIE_SHIFT)
 		__set_menvcfg_ext(SBI_HART_EXT_SVPBMT, ENVCFG_PBMTE)
-#endif
 		__set_menvcfg_ext(SBI_HART_EXT_SSTC, ENVCFG_STCE)
 		__set_menvcfg_ext(SBI_HART_EXT_SMCDELEG, ENVCFG_CDE);
 		__set_menvcfg_ext(SBI_HART_EXT_SVADU, ENVCFG_ADUE);
@@ -647,8 +645,10 @@ __pmp_skip:
 	__check_ext_csr(SBI_HART_PRIV_VER_UNKNOWN,
 			CSR_MTOPI, SBI_HART_EXT_SMAIA);
 	/* Detect if hart supports stimecmp CSR(Sstc extension) */
+#ifndef CONFIG_THEAD_C9XX_SMP
 	__check_ext_csr(SBI_HART_PRIV_VER_1_12,
 			CSR_STIMECMP, SBI_HART_EXT_SSTC);
+#endif
 	/* Detect if hart supports mstateen CSRs */
 	__check_ext_csr(SBI_HART_PRIV_VER_1_12,
 			CSR_MSTATEEN0, SBI_HART_EXT_SMSTATEEN);

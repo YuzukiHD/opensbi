@@ -1,0 +1,14 @@
+#!/bin/bash
+cd "$(dirname "$0")"
+
+export PLATFORM=generic
+export CROSS_COMPILE=riscv64-unknown-linux-gnu-
+export PLATFORM_DEFCONFIG=sun252i_v861_defconfig
+export FW_TEXT_START=0x40f80000
+export FW_JUMP_ADDR=0x42000000
+export PLATFORM_RISCV_ISA=rv32imafdcv_zicbom_zicbop_zicboz_zicntr_zicond_zicsr_zifencei_zihintntl_zihintpause_zihpm_zawrs_zfa_zfbfmin_zfh_zca_zcb_zcd_zcf_zba_zbb_zbc_zbs_zvfbfmin_zvfbfwma_zvfh_sscofpmf_sstc_svinval_svnapot_svpbmt_xtheadc_xtheadvdot
+export PLATFORM_RISCV_ABI=ilp32d
+export PLATFORM_RISCV_XLEN=32
+export FW_OPTIONS=2
+
+make clean && make -j

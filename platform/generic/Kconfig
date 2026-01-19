@@ -34,6 +34,13 @@ config PLATFORM_ALLWINNER_D1
 	select THEAD_C9XX_PMU
 	default n
 
+config PLATFORM_ALLWINNER_V861
+	bool "Allwinner V881/V861/V838 support"
+	depends on FDT_IRQCHIP_PLIC
+	select THEAD_C9XX_PMU
+	select THEAD_C9XX_SMP
+	default n
+
 config PLATFORM_ANDES_AE350
 	bool "Andes AE350 support"
 	select SYS_ATCSMU
