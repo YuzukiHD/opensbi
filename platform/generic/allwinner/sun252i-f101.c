@@ -77,12 +77,14 @@ static void sun252i_f101_riscv_cfg_init(void)
 static void sun252i_f101_hart_poweroff(u32 hartid, bool wakeup)
 {
 	/* Flush all dirty D-cache lines before the core is powered down. */
-	asm volatile("dcache.call" ::: "memory");
+	/* th.dcache.call; .word-encoded so upstream binutils (no xtheadcmo) work. */
+	asm volatile(".word 0x0010000b" ::: "memory");
 
 	if (csr_read(THEAD_C9XX_CSR_MXSTATUS) & BIT(22))
 		asm volatile("fence iorw, iorw" ::: "memory");
 	else
-		asm volatile("sync.s" ::: "memory");
+		/* th.sync.s; .word-encoded so upstream binutils (no xtheadsync) work. */
+		asm volatile(".word 0x0190000b" ::: "memory");
 
 	/* Stop cache snooping before the PMC removes power from the core. */
 	csr_clear(THEAD_C9XX_CSR_MSMPR, BIT(0));
