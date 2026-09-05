@@ -34,6 +34,12 @@ config PLATFORM_ALLWINNER_D1
 	select THEAD_C9XX_PMU
 	default n
 
+config PLATFORM_ALLWINNER_SUN252I_F101
+	bool "Allwinner SUN252I-F101 support"
+	depends on FDT_IRQCHIP_PLIC
+	select THEAD_C9XX_PMU
+	default n
+
 config PLATFORM_ANDES_AE350
 	bool "Andes AE350 support"
 	select ANDES_PMU

@@ -155,6 +155,16 @@ int uart8250_init(unsigned long base, u32 in_freq, u32 baudrate, u32 reg_shift,
 
 	sbi_console_set_device(&uart8250_console);
 
+	/*
+	 * Add the MMIO region covering the page that holds the UART. The
+	 * serial base may not be page-aligned (e.g. DesignWare APB UARTs
+	 * packed at 1 KiB stride), so align down to the page boundary to
+	 * keep the domain region at/above the PMP granularity. Otherwise
+	 * sbi_domain_root_add_memrange() splits it into sub-page chunks
+	 * that cannot be represented by a single PMP entry.
+	 */
+	base &= ~(PAGE_SIZE - 1);
+
 	return sbi_domain_root_add_memrange(base, PAGE_SIZE, PAGE_SIZE,
 					    (SBI_DOMAIN_MEMREGION_MMIO |
 					    SBI_DOMAIN_MEMREGION_SHARED_SURW_MRW));
