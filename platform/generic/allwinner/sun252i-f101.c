@@ -178,6 +178,15 @@ static int sun252i_f101_final_init(bool cold_boot)
 			return rc;
 	}
 
+#if __riscv_xlen == 32
+	/*
+	 * The C907 has Svpbmt in Sv32 too, with the memory type in bits 31:30
+	 * of the PTE. The generic code only enables PBMTE on RV64, and without
+	 * it those bits are PPN bits. PBMTE is bit 30 of menvcfgh here.
+	 */
+	csr_set64(CSR_MENVCFG, ENVCFG_PBMTE);
+#endif
+
 	return generic_final_init(cold_boot);
 }
 
